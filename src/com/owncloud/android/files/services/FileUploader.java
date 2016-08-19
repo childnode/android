@@ -981,6 +981,16 @@ public class FileUploader extends Service
                 .setProgress(100, 0, false)
                 .setContentText(
                         String.format(getString(R.string.uploader_upload_in_progress_content), 0, upload.getFileName())
+                )
+                .setAutoCancel(false)
+                .addAction(
+                        R.drawable.ic_action_delete_grey,
+                        getString(R.string.common_cancel),
+                        PendingIntent.getActivity(
+                                this,
+                                (int) System.nanoTime(),
+                                new Intent(this, FileUploader.ServiceHandler.class),
+                                0)
                 );
 
         /// includes a pending intent in the notification showing the details
@@ -988,10 +998,11 @@ public class FileUploader extends Service
         showUploadListIntent.putExtra(FileActivity.EXTRA_FILE, upload.getFile());
         showUploadListIntent.putExtra(FileActivity.EXTRA_ACCOUNT, upload.getAccount());
         showUploadListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mNotificationBuilder.setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis(),
+        mNotificationBuilder.setContentIntent(PendingIntent.getActivity(this, (int) System.nanoTime(),
             showUploadListIntent, 0));
 
         if (!upload.isInstantPicture() && !upload.isInstantVideo()) {
+            // TODO: should first parameter to notify not be a uniq mId?
             mNotificationManager.notify(R.string.uploader_upload_in_progress_ticker, mNotificationBuilder.build());
         }   // else wait until the upload really start (onTransferProgress is called), so that if it's discarded
         // due to lack of Wifi, no notification is shown
